@@ -932,6 +932,16 @@ footer {
     padding-bottom: 6px;
   }
 }
+#build-identity {
+  font-family: system-ui, sans-serif;
+  font-size: 11px;
+  line-height: 1.35;
+  text-align: center;
+  overflow-wrap: anywhere;
+  user-select: text;
+  padding: 1px 12px 4px;
+  color: #193e39;
+}
 @media (prefers-reduced-motion: reduce) {
   * {
     scroll-behavior: auto !important;

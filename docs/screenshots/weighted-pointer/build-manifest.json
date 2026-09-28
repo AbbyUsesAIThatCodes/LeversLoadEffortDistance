@@ -1,0 +1,19 @@
+{
+  "version": "0.1.0",
+  "codename": "Integrated Core",
+  "codenameSlug": "Integrated-Core",
+  "status": "development",
+  "milestone": "The existing 0.1.0 Integrated Core roadmap milestone; classroom release remains Issue #3.",
+  "scope": "local-c7d99b30",
+  "ordinal": 1,
+  "id": "0.1.0_Integrated-Core_local-c7d99b30_build-001_20260928T165428Z_g04ec60fe3218-dirty-6ab558ac_web",
+  "builtAt": "2026-09-28T16:54:28.409Z",
+  "target": "web",
+  "source": {
+    "sha": "04ec60fe3218f44c96de77722ea63dd80cb7a129",
+    "dirty": true,
+    "fingerprint": "6ab558ac2f0a3169b89b53a32d09de8ae0a4011f06283dc9a083f95c4ddfea50",
+    "prHead": null,
+    "ciCommit": null
+  }
+}

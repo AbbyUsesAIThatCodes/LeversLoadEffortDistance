@@ -12,6 +12,8 @@ import {
   swapPositions,
   measures,
   torque,
+  appliedTorque,
+  pointerTorque,
   advance,
   STOP,
   restore,
@@ -112,7 +114,7 @@ test("all coordinate states preserve ordering under move, step, distance, mass, 
           Number.isFinite(motion.angle) && Number.isFinite(motion.velocity),
         );
         assert.ok(Math.abs(motion.angle) <= STOP);
-        close(torque(extreme, angle), torque(extreme) * Math.cos(angle));
+        close(torque(extreme, angle), appliedTorque(extreme) * Math.cos(angle) + pointerTorque(angle));
       }
     }
   }

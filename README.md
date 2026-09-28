@@ -8,7 +8,9 @@ Version **0.1.0** implements the integrated core in
 [Issue #2](https://github.com/AbbyUsesAIThatCodes/LeversLoadEffortDistance/issues/2).
 It still needs the classroom readiness work in
 [Issue #3](https://github.com/AbbyUsesAIThatCodes/LeversLoadEffortDistance/issues/3).
-See the [Roadmap](docs/ROADMAP.md).
+See the [Roadmap](docs/ROADMAP.md). Review builds identify the existing
+**Integrated Core** milestone with a full build ID beneath the game title.
+See [Build Identity](docs/BUILD_IDENTITY.md) for the release record and inventory.
 
 ## Explore
 
@@ -29,8 +31,11 @@ See the [Roadmap](docs/ROADMAP.md).
 - **Hold Level** and **Hide Math** support predictions. Release tests the current
   turning effects. A held arrangement stays held after swapping; a released
   arrangement responds from its current tilt and motion, including while
-  dragging. Grabbing or releasing alone does not level the beam. Equal turning
-  effects can balance at an existing tilt; **Hold Level** brings it to horizontal.
+  dragging. Grabbing or releasing alone does not level the beam. The weighted
+  **Balance Pointer** returns matching turning effects smoothly to level. The
+  status shows **Settling…** until it is level and nearly stationary. Small
+  imbalances settle at a visible tilt; larger ones reach a travel stop.
+  See [Weighted Pointer Review](docs/WEIGHTED-POINTER.md).
 - **Balance & Advantage** compares mass × distance, IMA, and required effort mass.
   **Grams → Newtons** expands SI conversions. Hover or focus dotted terms and
   **?** buttons for explanations. Click/tap to keep help open; repeat, press
@@ -55,12 +60,16 @@ npm run dev
 ```
 
 Open <http://localhost:4173/LeversLoadEffortDistance/> or
-<http://localhost:4173/>. Serve `dist/` over HTTP, not `file://`.
+<http://localhost:4173/>. Serve `dist/` over HTTP, not `file://`. Each build also creates an immutable
+`artifacts/builds/<full-ID>/` folder containing `build-manifest.json` and
+`BUILD_REPORT.md`; `artifacts/current-build.json` identifies the latest local
+review build. Run `node scripts/verify-build.mjs` to check identity consistency.
 
 ```sh
 npm test
 npx playwright install chromium
 npm run test:browser
+node tests/weighted-pointer-browser.mjs
 ```
 
 For headless Linux, `BROWSER_SOFTWARE_GL=1` enables software WebGL and
@@ -83,8 +92,10 @@ The support and bounds keep the maximum masses above the work surface at both
 stops. The crate rests directly on the rail and tilts with it; the Effort and
 both downward force arrows stay vertical. The crate represents a point load at
 its labeled beam-axis coordinate, not a full rigid-body center-of-mass model.
-The only modeled masses are the labeled Load and Effort. The beam and attachments
-are ideal and massless; the pivot is ideal. Read
+The modeled masses are the labeled Load and Effort plus a fixed 250 g pointer
+bob 125 mm below the axle when level. The beam, pointer rod, and other attachments
+are ideal and massless; the pivot is ideal. The pointer contributes no torque
+at level, so the classroom mass × distance equality is unchanged. Read
 [Model and Teaching Notes](docs/MODEL-AND-TEACHING.md) for support assumptions,
 force application points, torque, and motion limitations.
 See the [Load Contact Review](docs/LOAD-CONTACT.md) for Issue #8 comparisons.

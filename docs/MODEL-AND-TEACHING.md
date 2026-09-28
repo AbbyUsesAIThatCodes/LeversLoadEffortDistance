@@ -42,8 +42,10 @@ This is an exact exchange, not a mirror around either zero or the fulcrum.
 
 ## Ideal Apparatus
 
-Only the labeled masses contribute to static balance. The beam, cord,
-carriages, and support are ideal and massless. The pivot has no static friction.
+The labeled masses determine level balance. A fixed 250 g pointer bob sits
+125 mm below the current axle on a rigid massless rod, rotating with the beam.
+It supplies a restoring torque when tilted and zero torque at level.
+The beam, cord, carriages, rod, and support are ideal and massless. The pivot has no static friction.
 The gold crate's base rests directly on the top rail. It scales about its base,
 rotates with the beam, and stays fixed at its selected position. Sliding and
 independent tipping are constrained, without a raised holder or visible restraint.
@@ -66,19 +68,31 @@ The guide-line dots in 3D and colored axis dots in the diagram identify the
 modeled application points. Both renderers use this same point-load model.
 
 For angle θ, both horizontal moment arms are the labeled arm times cos(θ).
-Signed net torque is `−Σ(mass × (objectX − fulcrumX)) × g × cos(θ)` in SI units.
-Both arms share the cosine factor, so the equilibrium ratio is unchanged.
-The math panel intentionally reports torques at level.
+Signed load/effort torque is `−Σ(mass × (objectX − fulcrumX)) × g × cos(θ)` in SI units.
+Both arms share the cosine factor. Add pointer torque `−m_p × g × h × sin(θ)`
+using kilograms and meters. The zero-torque angle is `atan2(A, K)`, clamped
+to the travel stops, where A is signed load/effort torque at level and
+K = m_p × g × h = 0.3065625 N·m. At level, pointer torque is zero, preserving
+the mass × distance equation. The math panel reports load/effort torques at
+level; it does not claim to show total instantaneous apparatus torque.
 
 ## Motion and Clearance
 
 Motion is illustrative: the model uses point-mass rotational inertia at the
-labeled arms and exponential damping. It does not compute real crate or hanging
+labeled arms plus bob inertia `m_p × h²`, and exponential damping. The
+illustrative damping rate is `2 × 0.85 × sqrt(K / I)` so high-inertia balanced
+arrangements also settle without a long drift. It does not compute real crate or hanging
 body inertia, transient contact forces, pendulum swing, or calibrated elapsed
 motion. There is no artificial imbalance threshold. Travel stops at ±12°.
-Reduced Animation jumps to the appropriate stop when unbalanced; at balance it
-keeps the current tilt and stops motion. Equal turning effects balance at any
-angle within the stops in this ideal model, not only at level.
+Reduced Animation jumps to the same constrained equilibrium angle as normal
+motion. Equal load/effort turning effects now settle level from either tilt.
+A nonzero difference settles tilted or at a stop; the smallest allowed
+difference (625 g·mm) gives about 1.15°, never an artificial balance deadband.
+The tile says Settling… when the products match but angle or angular speed
+is at least 0.1° or 0.1°/s, then Balanced. Unequal products never get a Balanced
+tile, including during a crossing through horizontal.
+Here Balanced means level balance of the two labeled products, not every
+possible stationary equilibrium of the apparatus including its pointer bob.
 
 The pivot sits 225 mm above the ideal desk in the visual scale. Labeled object
 positions stay within ±250 mm along the beam; minimum arm length is 75 mm,

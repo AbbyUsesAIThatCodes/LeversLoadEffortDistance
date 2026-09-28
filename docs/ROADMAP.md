@@ -14,3 +14,8 @@ Authoritative tracker: [Issue #1 — Levers: Load, Effort, and Distance](https:/
 Keep one implementation PR at a time. Distinguish **Issue #N** from **PR #N** in
 handoffs and descriptions. Review before merging or deploying; never modify or
 deploy the source games as part of this repository's work.
+
+The weighted pointer review retains the development **0.1.0 Integrated Core**
+milestone. See [Weighted Pointer Review](WEIGHTED-POINTER.md) and
+[Build Identity](BUILD_IDENTITY.md) for behavior, evidence, and generated review
+build records. The currently deployed build is independent of PR artifacts.

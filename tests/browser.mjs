@@ -310,15 +310,12 @@ try {
   );
   await page.screenshot({ path: "artifacts/swapped-released.png" });
   await page.waitForFunction(() => Number(document.querySelector("#app").dataset.angle) < -0.209);
-  const beforeSwapAngle = Number(await page.locator("#app").getAttribute("data-angle"));
   await page.locator("#swap").click();
   assert.deepEqual(await snapshot(), DEFAULT);
   assert.equal(await page.locator("#app").getAttribute("data-held"), "false");
-  assert.equal(
-    Number(await page.locator("#app").getAttribute("data-angle")),
-    beforeSwapAngle,
-    "a balanced swap preserves the existing settled tilt",
-  );
+  await page.waitForFunction(() => document.querySelector("#beam-status").textContent === "Balanced");
+  assert.ok(Math.abs(Number(await page.locator("#app").getAttribute("data-angle"))) < 0.002,
+    "the weighted pointer settles a balanced swap level; controlled-clock checks verify no edit reset");
   await page.locator("#preset").selectOption("offset");
   const off = await snapshot();
   await page.locator("#swap").click();
@@ -593,6 +590,7 @@ try {
   await diagramGeometry(fallback);
   await setNumber("mass-effort", 400, fallback);
   await controls(false, fallback);
+  await fallback.waitForFunction(() => document.querySelector("#beam-status").textContent === "Balanced");
   assert.equal(await fallback.locator("#beam-status").innerText(), "Balanced");
   const fallbackNotice = await fallback.locator("#fallback > p").boundingBox();
   const fallbackMath = await fallback.locator("#math-panel").boundingBox();

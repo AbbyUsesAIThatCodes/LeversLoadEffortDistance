@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import * as THREE from "three";
 import { createApparatus, HEIGHT, SCALE, COLORS } from "../src/apparatus.js";
-import { DEFAULT, STOP, GRAVITY, swapPositions, torque } from "../src/model.js";
+import { DEFAULT, STOP, GRAVITY, swapPositions, appliedTorque } from "../src/model.js";
 const box = (o) => new THREE.Box3().setFromObject(o),
   point = (o) => o.getWorldPosition(new THREE.Vector3());
 const close = (a, b) => assert.ok(Math.abs(a - b) < 1e-6, `${a} ≈ ${b}`);
@@ -76,7 +76,7 @@ test("seated crate contact, clearance and beam-axis point-load torque survive ma
                   assert.ok(effortBox.max.y < -railTop, "hanging weight clears beam");
                 }
               }
-              close(renderedPointTorque, torque(state, angle));
+              close(renderedPointTorque, appliedTorque(state, angle));
               close(rotation(a.weights.load).angleTo(rotation(a.beam)), 0);
               // The base's left and right edges lie on the tilted top-rail plane.
               const bottom = crate.geometry.boundingBox;
@@ -103,6 +103,6 @@ test("tilted rendered crate center differs from the ideal force point; torque in
     a.update(DEFAULT, angle);
     const center = point(a.weights.load.getObjectByName("gold-crate"));
     assert.ok(Math.abs(center.x - point(a.attachments.load).x) > 0.1);
-    close(torque(DEFAULT, angle), 0);
+    close(appliedTorque(DEFAULT, angle), 0);
   }
 });

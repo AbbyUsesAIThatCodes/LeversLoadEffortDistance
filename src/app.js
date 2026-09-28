@@ -19,6 +19,8 @@ import {
   restore,
   restingAngle,
   advance,
+  POINTER,
+  balanceStatus,
 } from "./model.js";
 import { fmt, helpTip, setTip, describeTooltips, renderMath, installTooltips } from "./math.js";
 const $ = (s) => document.querySelector(s),
@@ -193,18 +195,13 @@ function render() {
   if (fallback) drawFallback();
   if (ready) scene.dirty = true;
 }
-function updateStatus(isHeld = held) {
-  const direction = measures(state).direction;
-  const status = isHeld
-    ? "Held Level"
-    : direction === "balance"
-      ? "Balanced"
-      : `${cap(direction)} Side Down`;
+function updateStatus(isHeld = held, motion = ready ? scene.motion : fallbackMotion) {
+  const status = balanceStatus(state, motion, isHeld);
   if ($("#beam-status").textContent !== status)
     $("#beam-status").textContent = status;
   $("#beam-status").classList.toggle(
     "balanced",
-    direction === "balance" && !isHeld,
+    status === "Balanced",
   );
 }
 // Reserve the overlays even while hidden: toggling them must never reframe
@@ -247,8 +244,8 @@ function viewBounds() {
   }
 }
 
-function onFrame({ positions, angle, held: isHeld }) {
-  updateStatus(isHeld);
+function onFrame({ positions, angle, velocity, held: isHeld }) {
+  updateStatus(isHeld, { angle, velocity });
   $("#app").dataset.angle = angle;
   if (!positions.load) return;
   const compactControls = !$("#controls-panel").hidden && compactViewport.matches;
@@ -314,6 +311,9 @@ function drawFallback() {
     y: 195 - (x - state.fulcrum) * Math.sin(angle) * scale,
   });
   const ends = [point(-317.5), point(317.5)];
+  const pointerLength = POINTER.length * scale;
+  const pointerX = px + pointerLength * Math.sin(angle);
+  const pointerY = 195 + pointerLength * Math.cos(angle);
   $("#fallback-svg").innerHTML =
     `<defs>${OBJECTS.map((p) => `<marker id="arrow-${p}" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0L7,3L0,6Z" fill="${colors[p]}"/></marker>`).join("")}</defs><path d="M${px - 18} 360L${px} 195L${px + 18} 360Z" fill="${colors.fulcrum}"/><path data-beam d="M${ends[0].x} ${ends[0].y}L${ends[1].x} ${ends[1].y}" stroke="#839a94" stroke-width="12"/>${OBJECTS.map(
       (role) => {
@@ -329,7 +329,7 @@ function drawFallback() {
       },
     ).join(
       "",
-    )}<text x="${px}" y="386" text-anchor="middle" font-size="21" fill="${colors.fulcrum}">Fulcrum · ${state.fulcrum} mm</text>`;
+    )}<g data-balance-pointer role="img" aria-label="Weighted balance pointer"><path d="M${px} 195L${pointerX} ${pointerY}" stroke="#b68d46" stroke-width="5"/><circle data-pointer-bob cx="${pointerX}" cy="${pointerY}" r="13" fill="#b68d46"/><circle cx="${pointerX}" cy="${pointerY}" r="8" fill="${colors.fulcrum}"/><path data-pointer-zero d="M${px} ${195 + pointerLength + 18}v15" stroke="#b68d46" stroke-width="3"/></g><text x="${px}" y="386" text-anchor="middle" font-size="21" fill="${colors.fulcrum}">Fulcrum · ${state.fulcrum} mm</text>`;
   $("#app").dataset.angle = angle;
   updateStatus();
 }

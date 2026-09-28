@@ -1,5 +1,9 @@
 # Core Verification
 
+The September 27 report below records historical core verification. The
+[Weighted Pointer Review](WEIGHTED-POINTER.md) supersedes its balanced-tilt
+and reduced-animation behavior and records the current change's evidence.
+
 Verified locally on September 27, 2026, with Node.js 24.19.0 and Chromium
 153.0.8010.0 using software WebGL. The normal Playwright browser download failed
 in this environment; the same Playwright test runner used an alternate locally
@@ -35,7 +39,8 @@ checks the no-WebGL diagram, slider edits, balanced tilt, Help, Reduced Animatio
 Hold/Release, Reset, and motion preservation on WebGL loss. Clock control catches
 an immediate level reset even if a subsequent frame would hide it.
 
-Reduced Animation still intentionally skips the animated transition to a stop.
+Reduced Animation intentionally skips the animated transition; the weighted
+pointer revision targets the constrained equilibrium angle, including level.
 The tests use Chromium software WebGL, not classroom hardware.
 
 ## Visual Review

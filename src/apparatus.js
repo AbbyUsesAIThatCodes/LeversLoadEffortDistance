@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { massKey } from "./model.js";
+import { massKey, POINTER } from "./model.js";
 export const HEIGHT = 9,
   SCALE = 25,
   BEAM_TOP = 0.42;
@@ -103,6 +103,19 @@ export function createApparatus() {
       0.19,
       0.865,
     );
+  const pointer = new THREE.Group();
+  pointer.name = "balance-pointer";
+  moving.add(pointer);
+  const pointerLength = POINTER.length / SCALE;
+  const hub = cylinder(pointer, 0.21, 0.45, brass, 0, 0, 2.025, null, "pointer-hub");
+  hub.rotation.x = Math.PI / 2;
+  block(pointer, 0.16, pointerLength, 0.16, brass, 0, -pointerLength / 2, 2.2, null, "pointer-rod");
+  const bob = cylinder(pointer, 0.55, 0.3, brass, 0, -pointerLength, 2.2, null, "pointer-bob");
+  bob.rotation.x = Math.PI / 2;
+  const face = cylinder(pointer, 0.36, 0.035, COLORS.fulcrum, 0, -pointerLength, 2.37, null, "pointer-face");
+  face.rotation.x = Math.PI / 2;
+  // Stationary alignment mark follows the support; the pointer follows rotation.
+  block(base, 0.1, 0.7, 0.16, brass, 0, HEIGHT - pointerLength - 1, 2.2, null, "pointer-zero-mark");
   for (const role of ["load", "effort"]) {
     const anchor = new THREE.Group();
     anchor.name = `${role}-attachment`;
@@ -227,6 +240,7 @@ export function createApparatus() {
     moving,
     base,
     beam,
+    pointer,
     meshes,
     pickable,
     attachments,

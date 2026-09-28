@@ -16,7 +16,7 @@
             <span aria-hidden="true">⚖</span>
             <div>
               <b>Levers: Load, Effort, and Distance</b
-              ><small>Predict. Release. Explain. · v0.1.0</small>
+              ><small>Predict. Release. Explain. · v__RELEASE_VERSION__</small>
             </div>
           </div>
           <div class="actions">
@@ -36,6 +36,7 @@
             ><button id="fullscreen">Full Screen</button>
           </div>
         </header>
+        <div id="build-identity" aria-label="Build Identifier">__BUILD_ID__</div>
         <nav class="tools" aria-label="Workbench Controls">
           <output id="beam-status" aria-live="polite">Held Level</output
           ><button id="hold" aria-pressed="true">Release</button
@@ -178,7 +179,8 @@
           <b>Hold Level</b> and <b>Hide Math</b> let you predict. Release to see
           which side goes down, then reveal the calculation. While released,
           the beam keeps responding as you move objects; grabbing alone does
-          not level it. Equal turning effects can balance at an existing tilt.
+          not level it. When the turning effects match, the weighted pointer gently
+          returns the beam to level. Watch for Settling… followed by Balanced.
         </li>
         <li>
           <b>Swap Positions</b> exchanges exact beam coordinates. Each object
@@ -209,18 +211,26 @@
         apparatus, not every possible lever.
       </p>
       <p>
-        <b>Ideal Model:</b> only the two labeled masses count. The beam, cord,
-        and attachments are massless; the pivot is ideal. The crate stays fixed
+        <b>Balance Pointer:</b> the brass-and-purple pointer is fixed to the beam
+        and rotates with it. Its 250 g bob sits 125 mm below the axle when level.
+        Gravity pulls it back toward its alignment mark. It moves with the
+        fulcrum and contributes no turning effect at level. Small differences
+        between the load and effort can settle at a small tilt.
+      </p>
+      <p>
+        <b>Ideal Model:</b> the Load, Effort, and pointer bob have mass. The beam,
+        cord, pointer rod, and other attachments are massless; the pivot is ideal. The crate stays fixed
         at its selected beam position without sliding or tipping independently.
         It represents a downward point load at the labeled beam-axis point.
         The model does not simulate the full crate’s center of mass or the extra
-        torque its height would produce when tilted. Both modeled forces act
+        torque its height would produce when tilted. Both load and effort forces act
         vertically through their labeled points; arrows show force direction.
       </p>
       <p>
         <b>Distance and Motion:</b> arms run along the beam from the fulcrum to
         each force point. When tilted, both horizontal moment arms shrink by
-        cos(angle), so the balance ratio stays the same. The math panel shows
+        cos(angle). The pointer adds a restoring turning effect when tilted,
+        while the equation for level balance stays the same. The math panel shows
         turning effects at level. Motion uses an illustrative point-mass inertia
         and damping, limited to ±12°; it is not a calibrated acceleration
         simulation.

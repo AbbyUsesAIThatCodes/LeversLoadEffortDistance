@@ -53,3 +53,13 @@ secret needs to be added. Browser/device classroom checks remain separate from
 this lightweight deployment workflow.
 
 Reference: [GitHub's Custom Pages Workflow Documentation](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages).
+
+## Build Identity and Review Downloads
+
+Every build reserves its own identity; same-repository PR counters live in the
+`build-identity-ledger` branch. The build job uses contents write permission for
+that ledger only; PR artifacts do not deploy. Download the artifact named with
+the complete identifier from the Test and Build job. Its manifest and report
+identify exactly what was tested. Pages carries the same manifest to the hosted
+`build-manifest.json`; deploying an existing artifact does not change its ID.
+See [Build Identity](BUILD_IDENTITY.md).

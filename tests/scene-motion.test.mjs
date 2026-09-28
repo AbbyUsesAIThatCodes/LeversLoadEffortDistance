@@ -61,12 +61,12 @@ test("state edits and cancellation keep motion and let new forces act on the nex
   }
 });
 
-test("Hold levels the beam; balanced reduced motion and Help pauses preserve tilt", () => {
+test("Hold levels the beam; reduced motion reaches equilibrium and Help pauses preserve tilt", () => {
   const scene = sceneFor(DEFAULT);
   scene.motion = { angle: -STOP, velocity: 0 };
   scene.reduced = true;
   scene.frame(16);
-  assert.equal(scene.motion.angle, -STOP, "balanced forces do not force a level angle");
+  assert.equal(scene.motion.angle, 0, "reduced animation reaches the pointer equilibrium");
   scene.reduced = false;
   scene.setState(swapPositions(DEFAULT));
   scene.motion = { angle: -0.08, velocity: -0.3 };

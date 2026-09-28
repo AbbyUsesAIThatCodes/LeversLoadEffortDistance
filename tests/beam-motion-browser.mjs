@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { STOP } from "../src/model.js";
+import { STOP, restingAngle } from "../src/model.js";
 
 export async function verifyBeamMotion(browser, url, watch) {
   for (const mode of ["true", "fallback"]) {
@@ -25,6 +25,14 @@ export async function verifyBeamMotion(browser, url, watch) {
       e.dispatchEvent(new Event(event, { bubbles: true }));
     }, { value, event });
     const settle = () => page.clock.runFor(1000);
+    const equilibrium = async () => restingAngle(await page.evaluate(() => ({
+      load: Number(document.querySelector('[data-tag="load"]').dataset.coordinate),
+      effort: Number(document.querySelector('[data-tag="effort"]').dataset.coordinate),
+      fulcrum: Number(document.querySelector('#fulcrum-position').value),
+      loadMass: Number(document.querySelector('#mass-load').value),
+      effortMass: Number(document.querySelector('#mass-effort').value),
+    })));
+    const nearEquilibrium = async (message) => assert.ok(Math.abs(await angle() - await equilibrium()) < 0.005, message);
     async function startTilted() {
       await click("#reset");
       if (mode === "true") await click("#side");
@@ -71,9 +79,10 @@ export async function verifyBeamMotion(browser, url, watch) {
         await page.clock.runFor(16);
         assert.ok(await angle() > 0.15, `${role}: transitions from the previous tilt`);
         await settle();
-        assert.equal(await angle(), -STOP, `${role}: new turning effect acts during drag`);
+        await nearEquilibrium(`${role}: new turning effect acts during drag`);
+        const releaseAngle = await angle();
         await page.mouse.up();
-        assert.equal(await angle(), -STOP, `${role}: release does not level`);
+        assert.equal(await angle(), releaseAngle, `${role}: release does not level`);
       }
       for (const cancel of ["Escape", "pointercancel", "blur"]) {
         await startTilted();
@@ -98,22 +107,23 @@ export async function verifyBeamMotion(browser, url, watch) {
       await page.clock.runFor(16);
       assert.ok(await angle() > 0.15, `${mode}: ${id} transitions from the previous tilt`);
       await settle();
-      assert.equal(await angle(), -STOP, `${mode}: ${id} responds to the changed forces`);
+      await nearEquilibrium(`${mode}: ${id} responds to the changed forces`);
     }
     await startTilted();
     await input("#distance-slider-load", 100, "input");
     assert.equal(await angle(), STOP, `${mode}: balanced slider edit keeps tilt immediately`);
     await settle();
-    assert.equal(await angle(), STOP, `${mode}: zero net torque does not self-level`);
+    assert.ok(Math.abs(await angle()) < STOP / 2, `${mode}: pointer restores level smoothly`);
+    const pausedAngle = await angle();
     await click("#help");
     await settle();
-    assert.equal(await angle(), STOP, `${mode}: Help pauses in place`);
+    assert.equal(await angle(), pausedAngle, `${mode}: Help pauses in place`);
     await page.locator("#reduced").evaluate((e) => {
       e.checked = true; e.dispatchEvent(new Event("change"));
     });
     await click(".dialog-close.corner");
     await settle();
-    assert.equal(await angle(), STOP, `${mode}: balanced reduced animation preserves tilt`);
+    assert.equal(await angle(), 0, `${mode}: balanced reduced animation reaches level`);
     await click("#hold");
     await page.clock.runFor(32);
     assert.equal(await angle(), 0, `${mode}: Hold levels the beam`);
@@ -122,11 +132,12 @@ export async function verifyBeamMotion(browser, url, watch) {
     assert.equal(await angle(), 0, `${mode}: held edits stay level`);
     await click("#hold");
     await settle();
-    assert.equal(await angle(), STOP, `${mode}: Release uses the edited arrangement`);
+    await nearEquilibrium(`${mode}: Release uses the edited arrangement`);
+    const beforeLoss = await angle();
     if (mode === "true") {
       await page.locator("canvas").evaluate((e) => e.dispatchEvent(new Event("webglcontextlost", { cancelable: true })));
       assert.equal(await page.locator("#app").getAttribute("data-ready"), "fallback");
-      assert.equal(await angle(), STOP, "WebGL loss carries the current tilt into the diagram");
+      assert.equal(await angle(), beforeLoss, "WebGL loss carries the current tilt into the diagram");
     }
     await click("#reset");
     await page.clock.runFor(32);

@@ -122,6 +122,7 @@ export class LeverScene extends WorkshopScene {
     this.callbacks.onFrame?.({
       positions: this.screenPositions(),
       angle: this.motion.angle,
+      velocity: this.motion.velocity,
       direction: this.state ? measures(this.state).direction : "balance",
       held: this.held,
     });

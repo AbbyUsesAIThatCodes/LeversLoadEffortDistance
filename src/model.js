@@ -8,6 +8,10 @@ export const LIMIT = 250,
   GRAVITY = 9.81,
   STOP = Math.PI / 15;
 export const MASS = Object.freeze({ min: 25, max: 1000, step: 25 });
+// A fixed bob on a massless rigid pointer, centered below the current axle.
+// The rod rotates WITH the beam (it is not a freely hanging pendulum).
+export const POINTER = Object.freeze({ mass: 250, length: 125, dampingRatio: 0.85 });
+export const POINTER_STIFFNESS = POINTER.mass / 1000 * GRAVITY * POINTER.length / 1000;
 export const DEFAULT = Object.freeze({
   load: -100,
   fulcrum: 0,
@@ -135,7 +139,7 @@ export function measures(state) {
 }
 // Ideal vertical point loads at labeled beam-axis points, not mesh centers of
 // mass (including the seated crate's height). Positive rotation raises +x.
-export function torque(state, angle = 0) {
+export function appliedTorque(state, angle = 0) {
   return (
     ((-(
       state.loadMass * (state.load - state.fulcrum) +
@@ -146,9 +150,23 @@ export function torque(state, angle = 0) {
       Math.cos(angle) || 0
   );
 }
-export function restingAngle(state, currentAngle = 0) {
-  // Equal turning effects balance at any existing tilt in this ideal model.
-  return Math.sign(torque(state)) * STOP || currentAngle;
+export function pointerTorque(angle) {
+  return -POINTER_STIFFNESS * Math.sin(angle);
+}
+export function torque(state, angle = 0) {
+  return appliedTorque(state, angle) + pointerTorque(angle);
+}
+export function restingAngle(state) {
+  // A*cos(theta) - K*sin(theta) = 0. Stops constrain the physical equilibrium.
+  return Math.max(-STOP, Math.min(STOP, Math.atan2(appliedTorque(state), POINTER_STIFFNESS)));
+}
+export function balanceStatus(state, motion, held = false) {
+  if (held) return "Held Level";
+  const direction = measures(state).direction;
+  if (direction !== "balance") return `${direction === "load" ? "Load" : "Effort"} Side Down`;
+  // These tolerances describe settled motion, never the correctness of the math.
+  return Math.abs(motion.angle) < Math.PI / 1800 && Math.abs(motion.velocity) < Math.PI / 1800
+    ? "Balanced" : "Settling…";
 }
 export function advance(state, motion, seconds) {
   if (!Number.isFinite(seconds) || seconds <= 0) return { ...motion };
@@ -158,13 +176,14 @@ export function advance(state, motion, seconds) {
   const inertia = OBJECTS.reduce(
     (sum, role) =>
       sum + (state[massKey(role)] / 1000) * (arm(state, role) / 1000) ** 2,
-    0,
+    POINTER.mass / 1000 * (POINTER.length / 1000) ** 2,
   );
+  const damping = 2 * POINTER.dampingRatio * Math.sqrt(POINTER_STIFFNESS / inertia);
   let { angle, velocity } = motion;
   for (let i = 0; i < count; i++) {
     // Illustrative point-mass motion; damping is visual settling, not static friction.
     velocity =
-      (velocity + (torque(state, angle) / inertia) * dt) * Math.exp(-4 * dt);
+      (velocity + (torque(state, angle) / inertia) * dt) * Math.exp(-damping * dt);
     angle += velocity * dt;
     if (Math.abs(angle) > STOP) {
       angle = Math.sign(angle) * STOP;

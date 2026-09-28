@@ -1,0 +1,16 @@
+{
+  "buildId": "0.1.0_Integrated-Core_local-c7d99b30_build-001_20260928T165428Z_g04ec60fe3218-dirty-6ab558ac_web",
+  "passed": true,
+  "checks": [
+    "reported arrangement",
+    "settling status",
+    "smallest imbalance",
+    "WebGL and SVG",
+    "laptop and projector",
+    "continuous drags and cancellations",
+    "Hold and Help",
+    "reduced animation",
+    "WebGL loss",
+    "visible build identity"
+  ]
+}

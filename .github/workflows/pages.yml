@@ -17,6 +17,8 @@ concurrency:
 jobs:
   build:
     name: Test and Build
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -32,7 +34,26 @@ jobs:
       - name: Check the Lever Model and Geometry
         run: npm test
       - name: Build the Game
+        id: game
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: npm run build
+      - name: Check Build Identity
+        run: node scripts/verify-build.mjs
+      - name: Install the Review Browser
+        run: npx playwright install --with-deps chromium
+      - name: Check Pointer Motion and Appearance
+        run: node tests/weighted-pointer-browser.mjs
+      - name: Include Review Evidence
+        env:
+          BUILD_PATH: ${{ steps.game.outputs.build_path }}
+        run: cp -R artifacts/weighted-pointer "$BUILD_PATH/review"
+      - name: Upload the Review Build
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.game.outputs.build_id }}
+          path: ${{ steps.game.outputs.build_path }}
+          retention-days: 14
       - name: Upload the Built Site
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4
