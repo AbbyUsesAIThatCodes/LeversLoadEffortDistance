@@ -1,0 +1,13 @@
+{
+  "scopes": {
+    "pr-17": 1
+  },
+  "lastReservation": {
+    "scope": "pr-17",
+    "ordinal": 1,
+    "run": "36455560601",
+    "attempt": "1",
+    "source": "5441a5f2d0f9e14b58226c5937d76114bc68d8e2",
+    "reservedAt": "2026-09-28T17:04:55.118Z"
+  }
+}
