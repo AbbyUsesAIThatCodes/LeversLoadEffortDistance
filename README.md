@@ -1,5 +1,7 @@
 # Levers: Load, Effort, and Distance
 
+**[Play LeversLoadEffortDistance Online](https://abbyusesaithatcodes.github.io/LeversLoadEffortDistance/)**
+
 An independent classroom lever game: a **gold Load** sits on and tilts with the beam,
 and a **teal Effort** hangs below the beam. Change either mass, change either arm,
 move the purple fulcrum, predict the result, and release the beam.
